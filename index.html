@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>AIT TravelOS Super App</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 15px; margin: 0; color: #333; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .tab { flex: 0 0 auto; padding: 10px 15px; background: #e5e7eb; border-radius: 8px; font-weight: bold; cursor: pointer; color:#555; font-size: 14px;}
+        .tab.active { background: #2481cc; color: #fff; }
+        .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; }
+        .card.active { display: block; }
+        label { font-weight: bold; font-size: 13px; display: block; margin-top: 12px; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; background: #f9fafb; }
+        .btn { width: 100%; padding: 15px; background: #2481cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 20px; }
+        .btn-green { background: #10b981; }
+        .btn-orange { background: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('booking')" id="tab_booking">🎫 Booking</div>
+        <div class="tab" onclick="switchTab('expense')" id="tab_expense">💸 Expense</div>
+        <div class="tab" onclick="switchTab('newTrip')" id="tab_newTrip">🚌 New Trip</div>
+        <div class="tab" onclick="switchTab('hr')" id="tab_hr">📍 Check-In</div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="card active" id="sec_booking">
+        <h3 style="margin-top:0; color:#2481cc;">New Booking</h3>
+        <label>Select Trip</label>
+        <select id="b_trip" class="tripDropdown"><option>Loading trips...</option></select>
+        <label>Customer Name</label><input type="text" id="b_cName">
+        <label>Phone</label><input type="tel" id="b_phone">
+        <label>Pickup Location & Notes</label><input type="text" id="b_pickup" placeholder="e.g. Aung Mingalar, front seat">
+        <label>Seats</label><input type="text" id="b_seats" placeholder="e.g. S01, S02">
+        <label>Total (Ks)</label><input type="number" id="b_total">
+        <label>Deposit Paid (Ks)</label><input type="number" id="b_dep">
+        <label>Status</label>
+        <select id="b_status"><option value="Confirmed">🟢 Confirmed</option><option value="Tentative">🟡 Tentative</option></select>
+        <button class="btn" id="btn_book" onclick="submitForm('booking')">Lock & Book</button>
+    </div>
+
+    <!-- Expense Form -->
+    <div class="card" id="sec_expense">
+        <h3 style="margin-top:0; color:#10b981;">Add Expense</h3>
+        <label>Select Trip</label>
+        <select id="e_trip" class="tripDropdown"><option>Loading...</option></select>
+        <label>Category</label><select id="e_cat"><option>Bus Rental</option><option>Hotel</option><option>Fuel</option><option>Guide Fee</option></select>
+        <label>Description</label><input type="text" id="e_desc">
+        <label>Amount (Ks)</label><input type="number" id="e_amt">
+        <button class="btn btn-green" id="btn_exp" onclick="submitForm('expense')">Save Expense</button>
+    </div>
+
+    <!-- New Trip Form -->
+    <div class="card" id="sec_newTrip">
+        <h3 style="margin-top:0; color:#f59e0b;">Create Trip</h3>
+        <label>Trip ID</label><input type="text" id="n_id" placeholder="BGN-001">
+        <label>Trip Name</label><input type="text" id="n_name" placeholder="Bagan 3D2N">
+        <label>Start Date</label><input type="date" id="n_date">
+        <label>Bus Layout</label><select id="n_layout"><option value="2+2">2+2 Standard</option><option value="2+1">2+1 VIP</option></select>
+        <label>Total Seats</label><input type="number" id="n_seats" placeholder="45">
+        <label>Price (Ks)</label><input type="number" id="n_price">
+        <button class="btn btn-orange" id="btn_trip" onclick="submitForm('create_trip')">Generate Trip</button>
+    </div>
+
+    <!-- HR Check-in -->
+    <div class="card" id="sec_hr">
+        <h3 style="margin-top:0; color:#4caf50;">📍 GPS Check-In</h3>
+        <p id="gpsStatus">Locating...</p>
+        <button class="btn btn-green" id="btnCheckIn" style="display:none;" onclick="submitForm('checkin')">Verify & Check-In</button>
+    </div>
+
+<script>
+    const tg = window.Telegram.WebApp; tg.expand();
+    const API = "YOUR_APPS_SCRIPT_WEB_APP_URL"; // 🔴 ဒီနေရာမှာ Apps Script URL ထည့်ပါ
+    let lat=0, lng=0;
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab_' + id).classList.add('active');
+        document.getElementById('sec_' + id).classList.add('active');
+        
+        if(id==='hr') {
+            navigator.geolocation.getCurrentPosition(p => { lat=p.coords.latitude; lng=p.coords.longitude; document.getElementById('gpsStatus').innerText = "GPS Locked"; document.getElementById('btnCheckIn').style.display='block'; }, e => document.getElementById('gpsStatus').innerText = "Please enable GPS.");
+        }
+    }
+
+    // Auto load trips
+    window.onload = async () => {
+        if (!tg.initData) return;
+        try {
+            // Fix: Added Content-Type text/plain to avoid CORS
+            let res = await fetch(API, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ initData: tg.initData, action: "get_active_trips" }) });
+            let data = await res.json();
+            if(data.success && data.data) { 
+                let html = data.data.map(t => `<option value="${t.id}">${t.name} - ${t.price}Ks</option>`).join(""); 
+                document.querySelectorAll('.tripDropdown').forEach(el => el.innerHTML = html); 
+            }
+        } catch (e) { console.error("Dropdown Error:", e); }
+    };
+
+    // 🛡️ CRITICAL FIX: Make submitForm 'async' and remove 'no-cors'
+    async function submitForm(action) {
+        if (!tg.initData) return tg.showAlert("Security Check Failed.");
+        
+        // Disable buttons to prevent double-clicks
+        let btn;
+        if(action==='booking') btn = document.getElementById('btn_book');
+        else if(action==='expense') btn = document.getElementById('btn_exp');
+        else if(action==='create_trip') btn = document.getElementById('btn_trip');
+        else if(action==='checkin') btn = document.getElementById('btnCheckIn');
+        if(btn) { btn.disabled = true; btn.innerText = "Processing..."; }
+
+        let p = { initData: tg.initData, action: action, req_id: "REQ-"+Date.now() };
+
+        if (action === "booking") {
+            p.Trip_ID = document.getElementById('b_trip').value; p.Customer = document.getElementById('b_cName').value; p.Phone = document.getElementById('b_phone').value; p.Pickup = document.getElementById('b_pickup').value; p.Seats = document.getElementById('b_seats').value; p.Total = parseInt(document.getElementById('b_total').value)||0; p.Deposit = parseInt(document.getElementById('b_dep').value)||0; p.Balance = p.Total - p.Deposit; p.Status = document.getElementById('b_status').value;
+            if(!p.Trip_ID || !p.Customer || !p.Seats) { if(btn) { btn.disabled=false; btn.innerText="Lock & Book"; } return tg.showAlert("Fill required fields!"); }
+        } else if (action === "expense") {
+            p.Trip_ID = document.getElementById('e_trip').value; p.Category = document.getElementById('e_cat').value; p.Desc = document.getElementById('e_desc').value; p.Amount = parseInt(document.getElementById('e_amt').value)||0;
+        } else if (action === "create_trip") {
+            p.Trip_ID = document.getElementById('n_id').value; p.Trip_Name = document.getElementById('n_name').value; p.Start_Date = document.getElementById('n_date').value; p.Layout = document.getElementById('n_layout').value; p.Seats = parseInt(document.getElementById('n_seats').value)||0; p.Price = parseInt(document.getElementById('n_price').value)||0;
+        } else if (action === "checkin") {
+            p.Lat = lat; p.Lng = lng;
+        }
+
+        tg.HapticFeedback.impactOccurred("light");
+
+        // 🛡️ CRITICAL FIX: Proper fetch call to catch errors
+        try {
+            let res = await fetch(API, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                body: JSON.stringify(p) 
+            });
+            let data = await res.json();
+            
+            if (data.success) {
+                tg.showAlert("✅ Success!");
+                tg.close();
+            } else {
+                tg.showAlert("⚠️ Error: " + data.error);
+                if(btn) { btn.disabled = false; btn.innerText = "Try Again"; }
+            }
+        } catch (error) {
+            tg.showAlert("Network Error: " + error.message);
+            if(btn) { btn.disabled = false; btn.innerText = "Try Again"; }
+        }
+    }
+</script>
+</body>
+</html>

@@ -271,3 +271,75 @@ tripId:tripId.value
 
 </body>
 </html>
+<!-- payroll.html -->
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{font-family:sans-serif;padding:20px}
+button{width:100%;padding:14px;background:#16a34a;color:#fff;border:0}
+</style>
+</head>
+<body>
+
+<h3>Payroll</h3>
+
+<button onclick="run()">RUN PAYROLL</button>
+
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+
+function run(){
+fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+method:"POST",
+body:JSON.stringify({
+action:"run_payroll"
+})
+})
+.then(r=>r.json())
+.then(x=>tg.showAlert("Payroll Done"));
+}
+</script>
+
+</body>
+</html>
+<!-- report.html -->
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{font-family:sans-serif;padding:20px}
+button{width:100%;padding:14px;background:#2563eb;color:#fff;border:0}
+</style>
+</head>
+<body>
+
+<h3>Reports</h3>
+
+<button onclick="daily()">DAILY SUMMARY</button>
+<button onclick="dash()">OWNER DASHBOARD</button>
+
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+
+function daily(){
+fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+method:"POST",
+body:JSON.stringify({action:"daily_summary"})
+}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+}
+
+function dash(){
+fetch("",{
+method:"POST",
+body:JSON.stringify({action:"dashboard"})
+}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+}
+</script>
+
+</body>
+</html>

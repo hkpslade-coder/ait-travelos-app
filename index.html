@@ -105,3 +105,169 @@ tg.close();
 
 </body>
 </html>
+
+<!-- finance.html -->
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{font-family:sans-serif;padding:20px}
+input,select,button{width:100%;padding:12px;margin-bottom:10px}
+button{background:#dc2626;color:#fff;border:0}
+</style>
+</head>
+<body>
+
+<h3>Expense Request</h3>
+
+<select id="category">
+<option>Fuel</option>
+<option>Food</option>
+<option>Hotel</option>
+<option>Other</option>
+</select>
+
+<input id="amount" placeholder="Amount">
+<input id="note" placeholder="Note">
+
+<button onclick="save()">SEND REQUEST</button>
+
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+
+function save(){
+fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+method:"POST",
+body:JSON.stringify({
+action:"expense",
+category:category.value,
+amount:+amount.value,
+note:note.value
+})
+})
+.then(r=>r.json())
+.then(x=>{tg.showAlert("Sent");tg.close();});
+}
+</script>
+
+</body>
+</html>
+
+<!-- hr.html -->
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{font-family:sans-serif;padding:20px}
+input,button{width:100%;padding:12px;margin-bottom:10px}
+button{background:#16a34a;color:#fff;border:0}
+</style>
+</head>
+<body>
+
+<h3>HR Module</h3>
+
+<input id="staffId" placeholder="Staff ID">
+<input id="name" placeholder="Name">
+
+<button onclick="cin()">CHECK IN</button>
+<button onclick="cout()">CHECK OUT</button>
+
+<input id="adv" placeholder="Advance Amount">
+<input id="reason" placeholder="Reason">
+
+<button onclick="advance()">SALARY ADVANCE</button>
+
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+
+function cin(){
+fetch("",{
+method:"POST",
+body:JSON.stringify({
+action:"checkin",
+staffId:staffId.value,
+name:name.value
+})
+}).then(r=>r.json()).then(x=>tg.showAlert("Checked In"));
+}
+
+function cout(){
+fetch("",{
+method:"POST",
+body:JSON.stringify({
+action:"checkout",
+staffId:staffId.value,
+name:name.value
+})
+}).then(r=>r.json()).then(x=>tg.showAlert("Checked Out"));
+}
+
+function advance(){
+fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+method:"POST",
+body:JSON.stringify({
+action:"advance",
+staffId:staffId.value,
+name:name.value,
+amount:+adv.value,
+reason:reason.value
+})
+}).then(r=>r.json()).then(x=>tg.showAlert("Requested"));
+}
+</script>
+
+</body>
+</html>
+
+<!-- ops.html -->
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{font-family:sans-serif;padding:20px}
+input,button{width:100%;padding:12px;margin-bottom:10px}
+button{background:#2563eb;color:#fff;border:0}
+</style>
+</head>
+<body>
+
+<h3>Operations</h3>
+
+<input id="tripId" placeholder="Trip ID">
+
+<button onclick="manifest()">SEND MANIFEST</button>
+<button onclick="closeTripBtn()">CLOSE TRIP</button>
+
+<script>
+const tg=window.Telegram.WebApp;tg.expand();
+
+function manifest(){
+fetch("",{
+method:"POST",
+body:JSON.stringify({
+action:"manifest",
+tripId:tripId.value
+})
+}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+}
+
+function closeTripBtn(){
+fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+method:"POST",
+body:JSON.stringify({
+action:"close_trip",
+tripId:tripId.value
+})
+}).then(r=>r.json()).then(x=>tg.showAlert("Closed"));
+}
+</script>
+
+</body>
+</html>

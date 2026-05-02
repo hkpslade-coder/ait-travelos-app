@@ -1,344 +1,402 @@
-<!-- booking.html -->
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AIT Company OS</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-body{font-family:sans-serif;padding:20px}
-input,button{width:100%;padding:12px;margin-bottom:10px}
-button{background:#0088cc;color:#fff;border:0}
-</style>
-</head>
-<body>
+*{margin:0;padding:0;box-sizing:border-box}
 
-<h3>Booking</h3>
-
-<input id="trip" placeholder="Trip ID">
-<input id="name" placeholder="Customer Name">
-<input id="phone" placeholder="Phone">
-<input id="seats" placeholder="S01,S02">
-<input id="total" placeholder="Total">
-<input id="deposit" placeholder="Deposit">
-
-<button onclick="save()">CONFIRM</button>
-
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-function save(){
-
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
-method:"POST",
-body:JSON.stringify({
-action:"book",
-tripId:trip.value,
-name:name.value,
-phone:phone.value,
-seats:seats.value.split(",").map(x=>x.trim()),
-total:+total.value,
-deposit:+deposit.value,
-method:"Cash"
-})
-})
-.then(r=>r.json())
-.then(x=>{
-tg.showAlert("Success");
-tg.close();
-});
-
+body{
+font-family:Arial,"Pyidaungsu","Noto Sans Myanmar",sans-serif;
+background:#f4f6fb;
+color:#111827;
+padding-bottom:90px;
 }
-</script>
 
-</body>
-</html>
-<!-- owner.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-input,button{width:100%;padding:12px;margin-bottom:10px}
-button{background:#16a34a;color:#fff;border:0}
-</style>
-</head>
-<body>
-
-<h3>Create Trip</h3>
-
-<input id="tripId" placeholder="Trip ID">
-<input id="route" placeholder="Route">
-<input id="departAt" placeholder="2026-05-10 18:00">
-<input id="price" placeholder="Price">
-<input id="seats" placeholder="Seats">
-
-<button onclick="save()">CREATE TRIP</button>
-
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-function save(){
-
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
-method:"POST",
-body:JSON.stringify({
-action:"create_trip",
-tripId:tripId.value,
-route:route.value,
-departAt:departAt.value,
-price:+price.value,
-totalSeats:+seats.value
-})
-})
-.then(r=>r.json())
-.then(x=>{
-tg.showAlert("Trip Created");
-tg.close();
-});
-
+.header{
+padding:18px;
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+color:#fff;
+border-radius:0 0 22px 22px;
+box-shadow:0 8px 20px rgba(37,99,235,.25);
 }
-</script>
 
-</body>
-</html>
+.header h1{
+font-size:22px;
+margin-bottom:6px;
+}
 
-<!-- finance.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-input,select,button{width:100%;padding:12px;margin-bottom:10px}
-button{background:#dc2626;color:#fff;border:0}
+.header p{
+font-size:14px;
+opacity:.95;
+}
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+padding:15px;
+margin-top:-10px;
+}
+
+.box{
+background:#fff;
+padding:16px;
+border-radius:14px;
+box-shadow:0 4px 14px rgba(0,0,0,.05);
+}
+
+.box .label{
+font-size:13px;
+color:#6b7280;
+margin-bottom:6px;
+}
+
+.box .value{
+font-size:20px;
+font-weight:700;
+}
+
+.section{
+padding:0 15px 15px;
+display:none;
+}
+
+.section.active{
+display:block;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+box-shadow:0 4px 14px rgba(0,0,0,.05);
+margin-bottom:14px;
+}
+
+.card h3{
+font-size:18px;
+margin-bottom:12px;
+}
+
+input,select,textarea{
+width:100%;
+padding:13px;
+border:1px solid #d1d5db;
+border-radius:10px;
+font-size:15px;
+margin-bottom:12px;
+background:#fff;
+outline:none;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+background:#2563eb;
+color:#fff;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+}
+
+button.green{background:#16a34a}
+button.orange{background:#ea580c}
+button.red{background:#dc2626}
+
+.grid2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.bottom{
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+background:#fff;
+padding:10px;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+box-shadow:0 -4px 18px rgba(0,0,0,.08);
+}
+
+.navbtn{
+background:#eef2ff;
+border:none;
+padding:10px 4px;
+border-radius:12px;
+font-size:12px;
+font-weight:700;
+color:#374151;
+}
+
+.navbtn.active{
+background:#2563eb;
+color:#fff;
+}
+
+.small{
+font-size:13px;
+color:#6b7280;
+margin-bottom:10px;
+}
+
+.list{
+padding:12px;
+background:#f9fafb;
+border-radius:10px;
+font-size:14px;
+margin-bottom:10px;
+}
+
 </style>
 </head>
+
 <body>
 
-<h3>Expense Request</h3>
+<div class="header">
+<h1>🚀 AIT Company OS</h1>
+<p id="welcome">Loading...</p>
+</div>
 
-<select id="category">
-<option>Fuel</option>
-<option>Food</option>
-<option>Hotel</option>
-<option>Other</option>
+<div class="stats">
+<div class="box">
+<div class="label">Today Revenue</div>
+<div class="value" id="rev">0</div>
+</div>
+
+<div class="box">
+<div class="label">Pending</div>
+<div class="value" id="pending">0</div>
+</div>
+
+<div class="box">
+<div class="label">Trips</div>
+<div class="value" id="trips">0</div>
+</div>
+
+<div class="box">
+<div class="label">Staff In</div>
+<div class="value" id="staffin">0</div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="section active" id="home">
+
+<div class="card">
+<h3>Quick Actions</h3>
+<div class="grid2">
+<button onclick="tab('booking')">🚌 Booking</button>
+<button onclick="tab('trip')">🛣 Create Trip</button>
+<button onclick="tab('finance')" class="green">💰 Finance</button>
+<button onclick="tab('hr')" class="orange">👥 HR</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Live Updates</h3>
+<div class="list">✅ System Connected</div>
+<div class="list">📡 Telegram Ready</div>
+<div class="list">🔥 Backend Online</div>
+</div>
+
+</div>
+
+<!-- BOOKING -->
+<div class="section" id="booking">
+<div class="card">
+<h3>🚌 New Booking</h3>
+
+<input id="b_trip" placeholder="Trip ID">
+<input id="b_customer" placeholder="Customer Name">
+<input id="b_phone" placeholder="Phone">
+<input id="b_seats" placeholder="S01,S02">
+<input id="b_total" type="number" placeholder="Total">
+<input id="b_dep" type="number" placeholder="Deposit">
+
+<button onclick="bookNow()">CONFIRM BOOKING</button>
+</div>
+</div>
+
+<!-- TRIP -->
+<div class="section" id="trip">
+<div class="card">
+<h3>🛣 Create Trip</h3>
+
+<input id="t_name" placeholder="Trip Name">
+<select id="t_layout">
+<option value="2+2">2+2</option>
+<option value="2+1">2+1 VIP</option>
 </select>
+<input id="t_depart" placeholder="2026-05-10 18:00">
+<input id="t_price" type="number" placeholder="Price">
+<input id="t_seats" type="number" placeholder="Seats">
 
-<input id="amount" placeholder="Amount">
-<input id="note" placeholder="Note">
+<button onclick="createTrip()" class="orange">CREATE TRIP</button>
+</div>
+</div>
 
-<button onclick="save()">SEND REQUEST</button>
+<!-- FINANCE -->
+<div class="section" id="finance">
+<div class="card">
+<h3>💰 Add Expense</h3>
+
+<input id="f_trip" placeholder="Trip ID">
+<input id="f_amt" type="number" placeholder="Amount">
+<input id="f_note" placeholder="Reason">
+
+<button onclick="expenseNow()" class="green">SUBMIT EXPENSE</button>
+</div>
+</div>
+
+<!-- HR -->
+<div class="section" id="hr">
+<div class="card">
+<h3>👥 Attendance</h3>
+
+<button onclick="checkin()" class="green">📍 CHECK IN</button>
+<br><br>
+<button onclick="checkout()" class="red">🏃 CHECK OUT</button>
+
+</div>
+</div>
+
+<!-- NAV -->
+<div class="bottom">
+<button class="navbtn active" onclick="tab('home',this)">🏠</button>
+<button class="navbtn" onclick="tab('booking',this)">🚌</button>
+<button class="navbtn" onclick="tab('trip',this)">🛣</button>
+<button class="navbtn" onclick="tab('finance',this)">💰</button>
+<button class="navbtn" onclick="tab('hr',this)">👥</button>
+</div>
 
 <script>
-const tg=window.Telegram.WebApp;tg.expand();
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-function save(){
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+const API = "https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec";
+
+document.getElementById("welcome").innerText =
+"Welcome " + (tg.initDataUnsafe?.user?.first_name || "User");
+
+function tab(id,el){
+document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+
+document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
+if(el) el.classList.add("active");
+}
+
+function post(data){
+data.initData=tg.initData;
+
+fetch(API,{
 method:"POST",
-body:JSON.stringify({
+headers:{"Content-Type":"text/plain;charset=utf-8"},
+body:JSON.stringify(data)
+})
+.then(r=>r.json())
+.then(res=>{
+if(res.ok){
+tg.showAlert("Success");
+loadStats();
+}else{
+tg.showAlert(res.error || "Failed");
+}
+})
+.catch(()=>tg.showAlert("Network Error"));
+}
+
+function bookNow(){
+post({
+action:"book",
+tripId:val("b_trip"),
+customer:val("b_customer"),
+phone:val("b_phone"),
+seats:val("b_seats"),
+total:+val("b_total"),
+deposit:+val("b_dep")
+});
+}
+
+function createTrip(){
+post({
+action:"create_trip",
+trip_name:val("t_name"),
+layout:val("t_layout"),
+depart:val("t_depart"),
+price:+val("t_price"),
+seats:+val("t_seats")
+});
+}
+
+function expenseNow(){
+post({
 action:"expense",
-category:category.value,
-amount:+amount.value,
-note:note.value
-})
-})
-.then(r=>r.json())
-.then(x=>{tg.showAlert("Sent");tg.close();});
+tripId:val("f_trip"),
+amount:+val("f_amt"),
+note:val("f_note")
+});
 }
-</script>
 
-</body>
-</html>
-
-<!-- hr.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-input,button{width:100%;padding:12px;margin-bottom:10px}
-button{background:#16a34a;color:#fff;border:0}
-</style>
-</head>
-<body>
-
-<h3>HR Module</h3>
-
-<input id="staffId" placeholder="Staff ID">
-<input id="name" placeholder="Name">
-
-<button onclick="cin()">CHECK IN</button>
-<button onclick="cout()">CHECK OUT</button>
-
-<input id="adv" placeholder="Advance Amount">
-<input id="reason" placeholder="Reason">
-
-<button onclick="advance()">SALARY ADVANCE</button>
-
-<script>
-const tg=window.Telegram.WebApp;tg.expand();
-
-function cin(){
-fetch("",{
-method:"POST",
-body:JSON.stringify({
+function checkin(){
+navigator.geolocation.getCurrentPosition(pos=>{
+post({
 action:"checkin",
-staffId:staffId.value,
-name:name.value
-})
-}).then(r=>r.json()).then(x=>tg.showAlert("Checked In"));
+lat:pos.coords.latitude,
+lng:pos.coords.longitude
+});
+},()=>{
+tg.showAlert("GPS Error");
+});
 }
 
-function cout(){
-fetch("",{
-method:"POST",
-body:JSON.stringify({
-action:"checkout",
-staffId:staffId.value,
-name:name.value
-})
-}).then(r=>r.json()).then(x=>tg.showAlert("Checked Out"));
+function checkout(){
+post({action:"checkout"});
 }
 
-function advance(){
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
-method:"POST",
-body:JSON.stringify({
-action:"advance",
-staffId:staffId.value,
-name:name.value,
-amount:+adv.value,
-reason:reason.value
-})
-}).then(r=>r.json()).then(x=>tg.showAlert("Requested"));
-}
-</script>
-
-</body>
-</html>
-
-<!-- ops.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-input,button{width:100%;padding:12px;margin-bottom:10px}
-button{background:#2563eb;color:#fff;border:0}
-</style>
-</head>
-<body>
-
-<h3>Operations</h3>
-
-<input id="tripId" placeholder="Trip ID">
-
-<button onclick="manifest()">SEND MANIFEST</button>
-<button onclick="closeTripBtn()">CLOSE TRIP</button>
-
-<script>
-const tg=window.Telegram.WebApp;tg.expand();
-
-function manifest(){
-fetch("",{
-method:"POST",
-body:JSON.stringify({
-action:"manifest",
-tripId:tripId.value
-})
-}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+function loadStats(){
+postStats();
 }
 
-function closeTripBtn(){
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
+function postStats(){
+fetch(API,{
 method:"POST",
+headers:{"Content-Type":"text/plain;charset=utf-8"},
 body:JSON.stringify({
-action:"close_trip",
-tripId:tripId.value
-})
-}).then(r=>r.json()).then(x=>tg.showAlert("Closed"));
-}
-</script>
-
-</body>
-</html>
-<!-- payroll.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-button{width:100%;padding:14px;background:#16a34a;color:#fff;border:0}
-</style>
-</head>
-<body>
-
-<h3>Payroll</h3>
-
-<button onclick="run()">RUN PAYROLL</button>
-
-<script>
-const tg=window.Telegram.WebApp;tg.expand();
-
-function run(){
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
-method:"POST",
-body:JSON.stringify({
-action:"run_payroll"
+action:"dashboard",
+initData:tg.initData
 })
 })
 .then(r=>r.json())
-.then(x=>tg.showAlert("Payroll Done"));
+.then(res=>{
+if(res.ok && res.data){
+set("rev",res.data.revenue||0);
+set("pending",res.data.pending||0);
+set("trips",res.data.trips||0);
+set("staffin",res.data.staff||0);
 }
-</script>
-
-</body>
-</html>
-<!-- report.html -->
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-body{font-family:sans-serif;padding:20px}
-button{width:100%;padding:14px;background:#2563eb;color:#fff;border:0}
-</style>
-</head>
-<body>
-
-<h3>Reports</h3>
-
-<button onclick="daily()">DAILY SUMMARY</button>
-<button onclick="dash()">OWNER DASHBOARD</button>
-
-<script>
-const tg=window.Telegram.WebApp;tg.expand();
-
-function daily(){
-fetch("https://script.google.com/macros/s/AKfycbzsJGvZWz0PPj30gD3CYZ3VvHCRLMktkvE9w1xhfy6CUTe4BmJw0mP5IKir0K5KyByE/exec",{
-method:"POST",
-body:JSON.stringify({action:"daily_summary"})
-}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+});
 }
 
-function dash(){
-fetch("",{
-method:"POST",
-body:JSON.stringify({action:"dashboard"})
-}).then(r=>r.json()).then(x=>tg.showAlert("Sent"));
+function set(id,v){
+document.getElementById(id).innerText=v;
 }
+
+function val(id){
+return document.getElementById(id).value.trim();
+}
+
+loadStats();
 </script>
 
 </body>
